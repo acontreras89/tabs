@@ -924,11 +924,13 @@ describe "TabBarView", ->
         callback(event) for callback in @changeStatusesCallbacks ? []
 
       # Mock atom.project to simulate we are working with a repository
-      spyOn(atom.project, 'getPaths').andReturn [tab.path]
-      spyOn(atom.project, 'getRepositories').andReturn [repository]
+      spyOn(atom.project, 'repositoryForDirectory').andCallFake -> Promise.resolve repository
 
       tab.setupVcsStatus()
       tab1.setupVcsStatus()
+
+      waitsFor ->
+        tab.updateVcsStatus.callCount > 0
 
     describe "when working inside a VCS repository", ->
       it "adds custom style for new items", ->
